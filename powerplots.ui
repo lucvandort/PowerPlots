@@ -10,6 +10,12 @@
     <height>860</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -63,7 +69,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDial" name="dial_4">
+         <widget class="QDial" name="voltage_amplitude">
           <property name="minimumSize">
            <size>
             <width>150</width>
@@ -87,6 +93,31 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QLCDNumber" name="voltage_amplitude_display">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="smallDecimalPoint">
+           <bool>false</bool>
+          </property>
+          <property name="digitCount">
+           <number>3</number>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Filled</enum>
+          </property>
+          <property name="value" stdset="0">
+           <double>100.000000000000000</double>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -102,7 +133,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDial" name="dial_3">
+         <widget class="QDial" name="voltage_phase_angle">
           <property name="minimumSize">
            <size>
             <width>150</width>
@@ -126,6 +157,31 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QLCDNumber" name="voltage_phase_display">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="smallDecimalPoint">
+           <bool>false</bool>
+          </property>
+          <property name="digitCount">
+           <number>4</number>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Filled</enum>
+          </property>
+          <property name="value" stdset="0">
+           <double>0.000000000000000</double>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -141,7 +197,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDial" name="dial_2">
+         <widget class="QDial" name="current_amplitude">
           <property name="minimumSize">
            <size>
             <width>150</width>
@@ -162,6 +218,31 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QLCDNumber" name="current_amplitude_display">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="smallDecimalPoint">
+           <bool>false</bool>
+          </property>
+          <property name="digitCount">
+           <number>3</number>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Filled</enum>
+          </property>
+          <property name="value" stdset="0">
+           <double>50.000000000000000</double>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -177,7 +258,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDial" name="dial">
+         <widget class="QDial" name="current_phase_angle">
           <property name="minimumSize">
            <size>
             <width>150</width>
@@ -201,7 +282,45 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QLCDNumber" name="current_phase_display">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="smallDecimalPoint">
+           <bool>false</bool>
+          </property>
+          <property name="digitCount">
+           <number>4</number>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Filled</enum>
+          </property>
+          <property name="value" stdset="0">
+           <double>0.000000000000000</double>
+          </property>
+         </widget>
+        </item>
        </layout>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </item>
@@ -228,5 +347,70 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>voltage_amplitude</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>voltage_amplitude_display</receiver>
+   <slot>display(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>136</x>
+     <y>680</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>136</x>
+     <y>789</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>voltage_phase_angle</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>voltage_phase_display</receiver>
+   <slot>display(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>391</x>
+     <y>680</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>391</x>
+     <y>789</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>current_amplitude</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>current_amplitude_display</receiver>
+   <slot>display(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>645</x>
+     <y>680</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>645</x>
+     <y>789</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>current_phase_angle</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>current_phase_display</receiver>
+   <slot>display(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>900</x>
+     <y>680</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>900</x>
+     <y>789</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
