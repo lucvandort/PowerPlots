@@ -20,6 +20,7 @@ class PowerPlotApp(QMainWindow):
         self.voltage_phase_angle.valueChanged.connect(self.update_plots)
         self.current_amplitude.valueChanged.connect(self.update_plots)
         self.current_phase_angle.valueChanged.connect(self.update_plots)
+        self.instantaneous_phase_angle.valueChanged.connect(self.update_plots)
 
     def init_phasor_plot(self):
         self.phasor_plot.canvas.axes.set_ylim([-2,2])
@@ -49,32 +50,41 @@ class PowerPlotApp(QMainWindow):
 
     def init_sinewave_plot(self):
         self.sinewave_plot.canvas.axes.set_ylim([-2,2])
-        self.sinewave_plot.canvas.axes.set_xlim([0,4*np.pi])
+        self.sinewave_plot.canvas.axes.set_xlim([-np.pi,3*np.pi])
         self.sinewave_plot.canvas.axes.grid(True)
         
-        self.phi = np.arange(0,4*np.pi,4*np.pi/1000)
+        self.sinewave_timelines = {}
+        self.sinewave_timelines[-1] = self.sinewave_plot.canvas.axes.axvline(x=-2*np.pi, color='black', zorder=1, lw=1, ls='--')
+        self.sinewave_timelines[0] = self.sinewave_plot.canvas.axes.axvline(x=0, color='black', zorder=1, lw=1, ls='--')
+        self.sinewave_timelines[1] = self.sinewave_plot.canvas.axes.axvline(x=2*np.pi, color='black', zorder=1, lw=1, ls='--')
+
+        self.phi = np.arange(-np.pi,3*np.pi,4*np.pi/1000)
 
         self.sinewave_lines = {}
         self.sinewave_lines['U'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'b', zorder=11)
         self.sinewave_lines['I'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'r', zorder=21)
         self.sinewave_lines['S'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'c', zorder=31)
-        self.sinewave_lines['P'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'g', zorder=41)
-        self.sinewave_lines['Q'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'm', zorder=51)
+        # self.sinewave_lines['P'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'g', zorder=41)
+        # self.sinewave_lines['Q'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'm', zorder=51)
 
-    def update_plots(self):
+    def update_plots(self, inst_phi=0):
         U = lambda phi=0: self.voltage_amplitude.value()/100 * np.exp(1j * self.voltage_phase_angle.value()/180*np.pi) * np.exp(1j*phi)
         I = lambda phi=0: self.current_amplitude.value()/100 * np.exp(1j * self.current_phase_angle.value()/180*np.pi) * np.exp(1j*phi)
         S1 = lambda phi=0: U(phi) * I(phi)
         S0 = lambda phi=0: U(phi) * np.conj(I(phi))
         S = lambda phi=0: S0(phi) + S1(phi)
+
+        inst_phi_deg = self.instantaneous_phase_angle.value() - 90
+        inst_phi_rad = inst_phi_deg / 180 * np.pi
+        self.instantaneous_phase_display.display(inst_phi_deg)
     
         # plot phasor lines
-        self.phasor_lines['U'].set_ydata([0,np.imag(U())])
-        self.phasor_lines['U'].set_xdata([0,np.real(U())])
-        self.phasor_lines['I'].set_ydata([0,np.imag(I())])
-        self.phasor_lines['I'].set_xdata([0,np.real(I())])
-        self.phasor_lines['S'].set_ydata([np.imag(S0()),np.imag(S())])
-        self.phasor_lines['S'].set_xdata([np.real(S0()),np.real(S())])
+        self.phasor_lines['U'].set_ydata([0,np.imag(U(inst_phi_rad))])
+        self.phasor_lines['U'].set_xdata([0,np.real(U(inst_phi_rad))])
+        self.phasor_lines['I'].set_ydata([0,np.imag(I(inst_phi_rad))])
+        self.phasor_lines['I'].set_xdata([0,np.real(I(inst_phi_rad))])
+        self.phasor_lines['S'].set_ydata([np.imag(S0(inst_phi_rad)),np.imag(S(inst_phi_rad))])
+        self.phasor_lines['S'].set_xdata([np.real(S0(inst_phi_rad)),np.real(S(inst_phi_rad))])
         # self.phasor_lines['Q'].set_ydata([0,np.imag(S1())])
         # self.phasor_lines['P'].set_xdata([0,np.real(S1())])
 
@@ -87,10 +97,10 @@ class PowerPlotApp(QMainWindow):
         self.phasor_circles['S'].set_ydata(np.imag(S(np.arange(0,2*np.pi,np.pi/180))))
 
         # plot phasor values
-        self.phasor_values['U'].set_xdata(np.real(U())*np.ones(2))
-        self.phasor_values['I'].set_xdata(np.real(I())*np.ones(2))
-        self.phasor_values['P'].set_xdata(np.real(S())*np.ones(2))
-        self.phasor_values['Q'].set_ydata(np.imag(S())*np.ones(2))
+        self.phasor_values['U'].set_xdata(np.real(U(inst_phi_rad))*np.ones(2))
+        self.phasor_values['I'].set_xdata(np.real(I(inst_phi_rad))*np.ones(2))
+        self.phasor_values['P'].set_xdata(np.real(S(inst_phi_rad))*np.ones(2))
+        self.phasor_values['Q'].set_ydata(np.imag(S(inst_phi_rad))*np.ones(2))
 
 
 
@@ -98,13 +108,24 @@ class PowerPlotApp(QMainWindow):
         self.phasor_plot.canvas.draw()
         self.phasor_plot.canvas.flush_events()
 
+
+        # update sinewave liens
         self.sinewave_lines['U'].set_ydata(np.real(U(self.phi)))
         self.sinewave_lines['I'].set_ydata(np.real(I(self.phi)))
-        self.sinewave_lines['S'].set_ydata(np.real(S0(self.phi)) + np.real(S1(self.phi)))
+        self.sinewave_lines['S'].set_ydata(np.real(S(self.phi)))
         # self.sinewave_lines['P'].set_ydata(np.)
+
+        # update sinewave timelines
+        self.sinewave_timelines[-1].set_xdata((inst_phi_rad-2*np.pi)*np.ones(2))
+        self.sinewave_timelines[0].set_xdata((inst_phi_rad)*np.ones(2))
+        self.sinewave_timelines[1].set_xdata((inst_phi_rad+2*np.pi)*np.ones(2))
 
         self.sinewave_plot.canvas.draw()
         self.sinewave_plot.canvas.flush_events()
+
+
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
