@@ -26,15 +26,26 @@ class PowerPlotApp(QMainWindow):
         self.phasor_plot.canvas.axes.set_xlim([-2,2])
         self.phasor_plot.canvas.axes.grid(True)
         
-        circle = np.exp(-1j*np.arange(0,2*np.pi,np.pi/180))
-        self.phasor_plot.canvas.axes.plot(np.real(circle), np.imag(circle), '0.5', lw=1)
+        self.phasor_plot.canvas.axes.axhline(color='black', zorder=1, lw=1)
+        self.phasor_plot.canvas.axes.axvline(color='black', zorder=1, lw=1)
+        unity_circle = np.exp(-1j*np.arange(0,2*np.pi,np.pi/180))
+        self.phasor_plot.canvas.axes.plot(np.real(unity_circle), np.imag(unity_circle), '0.2', zorder=-1, lw=1)
 
         self.phasor_lines = {}
-        self.phasor_lines['U'], = self.phasor_plot.canvas.axes.plot([0,0],[0,0], 'b', zorder=1, lw=3)
-        self.phasor_lines['I'], = self.phasor_plot.canvas.axes.plot([0,0],[0,0], 'r', zorder=2, lw=3)
-        self.phasor_lines['S'], = self.phasor_plot.canvas.axes.plot([0,0],[0,0], 'c', zorder=3, lw=3)
-        self.phasor_lines['P'], = self.phasor_plot.canvas.axes.plot([0,0],[0,0], 'g', zorder=4, lw=1, ls='--')
-        self.phasor_lines['Q'], = self.phasor_plot.canvas.axes.plot([0,0],[0,0], 'm', zorder=5, lw=1, ls='--')
+        self.phasor_lines['U'], = self.phasor_plot.canvas.axes.plot([0,0],[0,0], 'b', zorder=10, lw=3)
+        self.phasor_lines['I'], = self.phasor_plot.canvas.axes.plot([0,0],[0,0], 'r', zorder=20, lw=3)
+        self.phasor_lines['S'], = self.phasor_plot.canvas.axes.plot([0,0],[0,0], 'c', zorder=30, lw=3)
+
+        self.phasor_circles = {}
+        self.phasor_circles['U'], = self.phasor_plot.canvas.axes.plot(np.zeros(360), np.zeros(360), 'b', zorder=2, lw=1, ls='--')
+        self.phasor_circles['I'], = self.phasor_plot.canvas.axes.plot(np.zeros(360), np.zeros(360), 'r', zorder=3, lw=1, ls='--')
+        self.phasor_circles['S'], = self.phasor_plot.canvas.axes.plot(np.zeros(360), np.zeros(360), 'c', zorder=4, lw=1, ls='--')
+
+        self.phasor_values = {}
+        self.phasor_values['U'] = self.phasor_plot.canvas.axes.axvline(color='b', zorder=11, lw=1, ls='--')
+        self.phasor_values['I'] = self.phasor_plot.canvas.axes.axvline(color='r', zorder=21, lw=1, ls='--')
+        self.phasor_values['P'] = self.phasor_plot.canvas.axes.axvline(color='c', zorder=31, lw=1, ls='--')
+        self.phasor_values['Q'] = self.phasor_plot.canvas.axes.axhline(color='c', zorder=32, lw=1, ls='--')
 
     def init_sinewave_plot(self):
         self.sinewave_plot.canvas.axes.set_ylim([-2,2])
@@ -44,27 +55,46 @@ class PowerPlotApp(QMainWindow):
         self.phi = np.arange(0,4*np.pi,4*np.pi/1000)
 
         self.sinewave_lines = {}
-        self.sinewave_lines['U'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'b', zorder=1)
-        self.sinewave_lines['I'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'r', zorder=2)
-        self.sinewave_lines['S'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'c', zorder=3)
-        self.sinewave_lines['P'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'g', zorder=4)
-        self.sinewave_lines['Q'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'm', zorder=5)
+        self.sinewave_lines['U'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'b', zorder=11)
+        self.sinewave_lines['I'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'r', zorder=21)
+        self.sinewave_lines['S'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'c', zorder=31)
+        self.sinewave_lines['P'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'g', zorder=41)
+        self.sinewave_lines['Q'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'm', zorder=51)
 
     def update_plots(self):
         U = lambda phi=0: self.voltage_amplitude.value()/100 * np.exp(1j * self.voltage_phase_angle.value()/180*np.pi) * np.exp(1j*phi)
         I = lambda phi=0: self.current_amplitude.value()/100 * np.exp(1j * self.current_phase_angle.value()/180*np.pi) * np.exp(1j*phi)
         S1 = lambda phi=0: U(phi) * I(phi)
         S0 = lambda phi=0: U(phi) * np.conj(I(phi))
+        S = lambda phi=0: S0(phi) + S1(phi)
     
+        # plot phasor lines
         self.phasor_lines['U'].set_ydata([0,np.imag(U())])
         self.phasor_lines['U'].set_xdata([0,np.real(U())])
         self.phasor_lines['I'].set_ydata([0,np.imag(I())])
         self.phasor_lines['I'].set_xdata([0,np.real(I())])
-        self.phasor_lines['S'].set_ydata([np.imag(S0()),np.imag(S0())+np.imag(S1())])
-        self.phasor_lines['S'].set_xdata([np.real(S0()),np.real(S0())+np.real(S1())])
-        self.phasor_lines['Q'].set_ydata([0,np.imag(S1())])
-        self.phasor_lines['P'].set_xdata([0,np.real(S1())])
+        self.phasor_lines['S'].set_ydata([np.imag(S0()),np.imag(S())])
+        self.phasor_lines['S'].set_xdata([np.real(S0()),np.real(S())])
+        # self.phasor_lines['Q'].set_ydata([0,np.imag(S1())])
+        # self.phasor_lines['P'].set_xdata([0,np.real(S1())])
 
+        # plot phasor circles
+        self.phasor_circles['U'].set_xdata(np.real(U(np.arange(0,2*np.pi,np.pi/180))))
+        self.phasor_circles['U'].set_ydata(np.imag(U(np.arange(0,2*np.pi,np.pi/180))))
+        self.phasor_circles['I'].set_xdata(np.real(I(np.arange(0,2*np.pi,np.pi/180))))
+        self.phasor_circles['I'].set_ydata(np.imag(I(np.arange(0,2*np.pi,np.pi/180))))
+        self.phasor_circles['S'].set_xdata(np.real(S(np.arange(0,2*np.pi,np.pi/180))))
+        self.phasor_circles['S'].set_ydata(np.imag(S(np.arange(0,2*np.pi,np.pi/180))))
+
+        # plot phasor values
+        self.phasor_values['U'].set_xdata(np.real(U())*np.ones(2))
+        self.phasor_values['I'].set_xdata(np.real(I())*np.ones(2))
+        self.phasor_values['P'].set_xdata(np.real(S())*np.ones(2))
+        self.phasor_values['Q'].set_ydata(np.imag(S())*np.ones(2))
+
+
+
+        # refresh phasor plot
         self.phasor_plot.canvas.draw()
         self.phasor_plot.canvas.flush_events()
 
