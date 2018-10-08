@@ -1,10 +1,31 @@
-import sys
+import sys, time
 import numpy as np
 import matplotlib as mpl
 
 from PyQt5 import uic
+from PyQt5.QtCore import QThread, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout
 
+def trap_exc_during_debug(*args):
+    # when app raises uncaught exception, print info
+    print(args)
+
+sys.excepthook = trap_exc_during_debug
+
+class playbackThread(QThread):
+
+    sig_step = pyqtSignal()
+
+    def __init__(self):
+        QThread.__init__(self)
+
+    # def __del__(self):
+    #     self.wait()
+
+    def run(self):
+        while(True):
+            self.sig_step.emit()
+            time.sleep(0.1)
 
 class PowerPlotApp(QMainWindow):
 
@@ -23,8 +44,27 @@ class PowerPlotApp(QMainWindow):
         self.current_phase_angle.valueChanged.connect(self.update_plots)
         self.instantaneous_phase_angle.valueChanged.connect(self.update_plots)
 
-        # self.playback_button.clicked.connect(self.)
-        self.playback_reset_button.clicked.connect(self.reset_instantaneous_phase)
+        self.playback_button.clicked.connect(self.start_playback)
+        self.playback_reset_button.clicked.connect(self.set_instantaneous_phase)
+
+    def start_playback(self):
+        self.playback_reset_button.setEnabled(False)
+        self.instantaneous_phase_angle.setEnabled(False)
+        self.playback_button.setText('Pause')
+        self.playback_button.clicked.disconnect(self.start_playback)
+        self.playback_button.clicked.connect(self.stop_playback)
+
+        self.playback_thread = playbackThread()
+        self.playback_thread.sig_step.connect(self.increment_instantaneous_phase)
+        self.playback_thread.start()
+        self.playback_button.clicked.connect(self.playback_thread.terminate)
+
+    def stop_playback(self):
+        self.playback_reset_button.setEnabled(True)
+        self.instantaneous_phase_angle.setEnabled(True)
+        self.playback_button.setText('Play')
+        self.playback_button.clicked.disconnect(self.stop_playback)
+        self.playback_button.clicked.connect(self.start_playback)
 
     def init_phasor_plot(self):
         self.phasor_plot.canvas.axes.set_ylim([-2,2])
@@ -129,8 +169,11 @@ class PowerPlotApp(QMainWindow):
         self.sinewave_plot.canvas.flush_events()
 
 
-    def reset_instantaneous_phase(self):
-        self.instantaneous_phase_angle.setValue(90)
+    def set_instantaneous_phase(self, phase=0):
+        self.instantaneous_phase_angle.setValue(phase+90)
+
+    def increment_instantaneous_phase(self):
+        self.instantaneous_phase_angle.setValue(self.instantaneous_phase_angle.value()+1)
 
 
 
