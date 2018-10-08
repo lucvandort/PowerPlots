@@ -112,3 +112,4 @@ venv.bak/
 
 # qt
 .autosave
+.vscode/settings.json
