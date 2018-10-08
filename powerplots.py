@@ -112,6 +112,11 @@ class PowerPlotApp(QMainWindow):
         # self.sinewave_lines['P'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'g', zorder=41)
         # self.sinewave_lines['Q'], = self.sinewave_plot.canvas.axes.plot(self.phi, np.zeros(len(self.phi)), 'm', zorder=51)
 
+        self.sinewave_valuelines = {}
+        self.sinewave_valuelines['U'] = self.sinewave_plot.canvas.axes.axhline(color='b', zorder=11, lw=1, ls='--')
+        self.sinewave_valuelines['I'] = self.sinewave_plot.canvas.axes.axhline(color='r', zorder=11, lw=1, ls='--')
+        self.sinewave_valuelines['S'] = self.sinewave_plot.canvas.axes.axhline(color='c', zorder=11, lw=1, ls='--')
+
     def update_plots(self, inst_phi=0):
         U = lambda phi=0: self.voltage_amplitude.value()/100 * np.exp(1j * self.voltage_phase_angle.value()/180*np.pi) * np.exp(1j*phi)
         I = lambda phi=0: self.current_amplitude.value()/100 * np.exp(1j * self.current_phase_angle.value()/180*np.pi) * np.exp(1j*phi)
@@ -145,16 +150,14 @@ class PowerPlotApp(QMainWindow):
         self.phasor_values['U'].set_xdata(np.real(U(inst_phi_rad))*np.ones(2))
         self.phasor_values['I'].set_xdata(np.real(I(inst_phi_rad))*np.ones(2))
         self.phasor_values['P'].set_xdata(np.real(S(inst_phi_rad))*np.ones(2))
-        self.phasor_values['Q'].set_ydata(np.imag(S(inst_phi_rad))*np.ones(2))
-
-
+        # self.phasor_values['Q'].set_ydata(np.imag(S(inst_phi_rad))*np.ones(2))
 
         # refresh phasor plot
         self.phasor_plot.canvas.draw()
         self.phasor_plot.canvas.flush_events()
 
 
-        # update sinewave liens
+        # update sinewave lines
         self.sinewave_lines['U'].set_ydata(np.real(U(self.phi)))
         self.sinewave_lines['I'].set_ydata(np.real(I(self.phi)))
         self.sinewave_lines['S'].set_ydata(np.real(S(self.phi)))
@@ -165,6 +168,11 @@ class PowerPlotApp(QMainWindow):
         self.sinewave_timelines[0].set_xdata((inst_phi_rad)*np.ones(2))
         self.sinewave_timelines[1].set_xdata((inst_phi_rad+2*np.pi)*np.ones(2))
 
+        self.sinewave_valuelines['U'].set_ydata(np.real(U(inst_phi_rad))*np.ones(2))
+        self.sinewave_valuelines['I'].set_ydata(np.real(I(inst_phi_rad))*np.ones(2))
+        self.sinewave_valuelines['S'].set_ydata(np.real(S(inst_phi_rad))*np.ones(2))
+
+        # refresh sinewave plot
         self.sinewave_plot.canvas.draw()
         self.sinewave_plot.canvas.flush_events()
 
