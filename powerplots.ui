@@ -335,24 +335,21 @@
          </widget>
         </item>
         <item>
-         <widget class="QDial" name="playback_speed">
+         <widget class="QDial" name="current_amplitude_2">
           <property name="minimumSize">
            <size>
             <width>150</width>
             <height>150</height>
            </size>
           </property>
-          <property name="minimum">
-           <number>-180</number>
-          </property>
           <property name="maximum">
-           <number>180</number>
+           <number>100</number>
           </property>
-          <property name="wrapping">
-           <bool>true</bool>
+          <property name="value">
+           <number>0</number>
           </property>
           <property name="notchTarget">
-           <double>15.000000000000000</double>
+           <double>10.000000000000000</double>
           </property>
           <property name="notchesVisible">
            <bool>true</bool>
@@ -361,10 +358,23 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
           <item>
-           <widget class="QToolButton" name="toolButton">
+           <widget class="QPushButton" name="playback_button">
             <property name="text">
-             <string>...</string>
+             <string>Play</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="playback_reset_button">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="text">
+             <string>Reset</string>
             </property>
            </widget>
           </item>
@@ -452,7 +462,7 @@
      <x>0</x>
      <y>0</y>
      <width>1037</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

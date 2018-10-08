@@ -5,6 +5,7 @@ import matplotlib as mpl
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout
 
+
 class PowerPlotApp(QMainWindow):
 
     def __init__(self):
@@ -22,10 +23,14 @@ class PowerPlotApp(QMainWindow):
         self.current_phase_angle.valueChanged.connect(self.update_plots)
         self.instantaneous_phase_angle.valueChanged.connect(self.update_plots)
 
+        # self.playback_button.clicked.connect(self.)
+        self.playback_reset_button.clicked.connect(self.reset_instantaneous_phase)
+
     def init_phasor_plot(self):
         self.phasor_plot.canvas.axes.set_ylim([-2,2])
         self.phasor_plot.canvas.axes.set_xlim([-2,2])
         self.phasor_plot.canvas.axes.grid(True)
+        self.phasor_plot.canvas.axes.axis('equal')
         
         self.phasor_plot.canvas.axes.axhline(color='black', zorder=1, lw=1)
         self.phasor_plot.canvas.axes.axvline(color='black', zorder=1, lw=1)
@@ -124,6 +129,8 @@ class PowerPlotApp(QMainWindow):
         self.sinewave_plot.canvas.flush_events()
 
 
+    def reset_instantaneous_phase(self):
+        self.instantaneous_phase_angle.setValue(90)
 
 
 
