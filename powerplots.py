@@ -1,6 +1,7 @@
 import sys
 import time
 import numpy as np
+# import pyqtgraph as pg
 
 from PyQt5 import uic
 from PyQt5.QtCore import QThread, QTimer, pyqtSignal
@@ -112,39 +113,41 @@ class PowerPlotApp(QMainWindow):
             color='c', zorder=32, lw=1, ls='--')
 
     def init_sinewave_plot(self):
-        self.sinewave_plot.canvas.axes.set_ylim([-2, 2])
-        self.sinewave_plot.canvas.axes.set_xlim([-np.pi, 3*np.pi])
-        self.sinewave_plot.canvas.axes.grid(True)
+        self.sinewave_plot.plot(np.random.normal(size=100), clear=True)
 
-        self.sinewave_timelines = {}
-        self.sinewave_timelines[-1] = self.sinewave_plot.canvas.axes.axvline(
-            x=-2*np.pi, color='black', zorder=1, lw=1, ls='--')
-        self.sinewave_timelines[0] = self.sinewave_plot.canvas.axes.axvline(
-            x=0, color='black', zorder=1, lw=1, ls='--')
-        self.sinewave_timelines[1] = self.sinewave_plot.canvas.axes.axvline(
-            x=2*np.pi, color='black', zorder=1, lw=1, ls='--')
+        # self.sinewave_plot.canvas.axes.set_ylim([-2, 2])
+        # self.sinewave_plot.canvas.axes.set_xlim([-np.pi, 3*np.pi])
+        # self.sinewave_plot.canvas.axes.grid(True)
 
-        self.phi = np.arange(-np.pi, 3*np.pi, 4*np.pi/1000)
+        # self.sinewave_timelines = {}
+        # self.sinewave_timelines[-1] = self.sinewave_plot.canvas.axes.axvline(
+        #     x=-2*np.pi, color='black', zorder=1, lw=1, ls='--')
+        # self.sinewave_timelines[0] = self.sinewave_plot.canvas.axes.axvline(
+        #     x=0, color='black', zorder=1, lw=1, ls='--')
+        # self.sinewave_timelines[1] = self.sinewave_plot.canvas.axes.axvline(
+        #     x=2*np.pi, color='black', zorder=1, lw=1, ls='--')
 
-        self.sinewave_lines = {}
-        self.sinewave_lines['U'], = self.sinewave_plot.canvas.axes.plot(
-            self.phi, np.zeros(len(self.phi)), 'b', zorder=11)
-        self.sinewave_lines['I'], = self.sinewave_plot.canvas.axes.plot(
-            self.phi, np.zeros(len(self.phi)), 'r', zorder=21)
-        self.sinewave_lines['S'], = self.sinewave_plot.canvas.axes.plot(
-            self.phi, np.zeros(len(self.phi)), 'c', zorder=31)
-        # self.sinewave_lines['P'], = self.sinewave_plot.canvas.axes.plot(
-        #    self.phi, np.zeros(len(self.phi)), 'g', zorder=41)
-        # self.sinewave_lines['Q'], = self.sinewave_plot.canvas.axes.plot(
-        #    self.phi, np.zeros(len(self.phi)), 'm', zorder=51)
+        # self.phi = np.arange(-np.pi, 3*np.pi, 4*np.pi/1000)
 
-        self.sinewave_valuelines = {}
-        self.sinewave_valuelines['U'] = self.sinewave_plot.canvas.axes.axhline(
-            color='b', zorder=11, lw=1, ls='--')
-        self.sinewave_valuelines['I'] = self.sinewave_plot.canvas.axes.axhline(
-            color='r', zorder=11, lw=1, ls='--')
-        self.sinewave_valuelines['S'] = self.sinewave_plot.canvas.axes.axhline(
-            color='c', zorder=11, lw=1, ls='--')
+        # self.sinewave_lines = {}
+        # self.sinewave_lines['U'], = self.sinewave_plot.canvas.axes.plot(
+        #     self.phi, np.zeros(len(self.phi)), 'b', zorder=11)
+        # self.sinewave_lines['I'], = self.sinewave_plot.canvas.axes.plot(
+        #     self.phi, np.zeros(len(self.phi)), 'r', zorder=21)
+        # self.sinewave_lines['S'], = self.sinewave_plot.canvas.axes.plot(
+        #     self.phi, np.zeros(len(self.phi)), 'c', zorder=31)
+        # # self.sinewave_lines['P'], = self.sinewave_plot.canvas.axes.plot(
+        # #    self.phi, np.zeros(len(self.phi)), 'g', zorder=41)
+        # # self.sinewave_lines['Q'], = self.sinewave_plot.canvas.axes.plot(
+        # #    self.phi, np.zeros(len(self.phi)), 'm', zorder=51)
+
+        # self.sinewave_valuelines = {}
+        # self.sinewave_valuelines['U'] = self.sinewave_plot.canvas.axes.axhline(
+        #     color='b', zorder=11, lw=1, ls='--')
+        # self.sinewave_valuelines['I'] = self.sinewave_plot.canvas.axes.axhline(
+        #     color='r', zorder=11, lw=1, ls='--')
+        # self.sinewave_valuelines['S'] = self.sinewave_plot.canvas.axes.axhline(
+        #     color='c', zorder=11, lw=1, ls='--')
 
     def update_plots(self, inst_phi=0):
         U0 = self.voltage_amplitude.value()/100
@@ -212,29 +215,29 @@ class PowerPlotApp(QMainWindow):
         self.phasor_plot.canvas.flush_events()
 
         # update sinewave lines
-        self.sinewave_lines['U'].set_ydata(np.real(U(self.phi)))
-        self.sinewave_lines['I'].set_ydata(np.real(I(self.phi)))
-        self.sinewave_lines['S'].set_ydata(np.real(S(self.phi)))
+        # self.sinewave_lines['U'].set_ydata(np.real(U(self.phi)))
+        # self.sinewave_lines['I'].set_ydata(np.real(I(self.phi)))
+        # self.sinewave_lines['S'].set_ydata(np.real(S(self.phi)))
         # self.sinewave_lines['P'].set_ydata(np.)
 
         # update sinewave timelines
-        self.sinewave_timelines[-1].set_xdata(
-            (inst_phi_rad-2*np.pi)*np.ones(2))
-        self.sinewave_timelines[0].set_xdata(
-            (inst_phi_rad)*np.ones(2))
-        self.sinewave_timelines[1].set_xdata(
-            (inst_phi_rad+2*np.pi)*np.ones(2))
+        # self.sinewave_timelines[-1].set_xdata(
+        #     (inst_phi_rad-2*np.pi)*np.ones(2))
+        # self.sinewave_timelines[0].set_xdata(
+        #     (inst_phi_rad)*np.ones(2))
+        # self.sinewave_timelines[1].set_xdata(
+        #     (inst_phi_rad+2*np.pi)*np.ones(2))
 
-        self.sinewave_valuelines['U'].set_ydata(
-            np.real(U(inst_phi_rad))*np.ones(2))
-        self.sinewave_valuelines['I'].set_ydata(
-            np.real(I(inst_phi_rad))*np.ones(2))
-        self.sinewave_valuelines['S'].set_ydata(
-            np.real(S(inst_phi_rad))*np.ones(2))
+        # self.sinewave_valuelines['U'].set_ydata(
+        #     np.real(U(inst_phi_rad))*np.ones(2))
+        # self.sinewave_valuelines['I'].set_ydata(
+        #     np.real(I(inst_phi_rad))*np.ones(2))
+        # self.sinewave_valuelines['S'].set_ydata(
+        #     np.real(S(inst_phi_rad))*np.ones(2))
 
-        # refresh sinewave plot
-        self.sinewave_plot.canvas.draw()
-        self.sinewave_plot.canvas.flush_events()
+        # # refresh sinewave plot
+        # self.sinewave_plot.canvas.draw()
+        # self.sinewave_plot.canvas.flush_events()
 
     def set_instantaneous_phase(self, phase=0):
         self.instantaneous_phase_angle.setValue(phase+90)

@@ -40,7 +40,7 @@
        </widget>
       </item>
       <item>
-       <widget class="MplWidget" name="sinewave_plot" native="true">
+       <widget class="PlotWidget" name="sinewave_plot">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>10</horstretch>
@@ -474,6 +474,11 @@
    <extends>QWidget</extends>
    <header>mplwidget</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>pyqtgraph</header>
   </customwidget>
  </customwidgets>
  <resources/>
