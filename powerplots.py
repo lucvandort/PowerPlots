@@ -147,17 +147,25 @@ class PowerPlotApp(QMainWindow):
             color='c', zorder=11, lw=1, ls='--')
 
     def update_plots(self, inst_phi=0):
-        def U(phi=0): self.voltage_amplitude.value()/100 * np.exp(
-            1j * self.voltage_phase_angle.value()/180*np.pi) * np.exp(1j*phi)
+        U0 = self.voltage_amplitude.value()/100
+        Uangle = self.voltage_phase_angle.value()/180*np.pi
+        I0 = self.current_amplitude.value()/100
+        Iangle = self.current_phase_angle.value()/180*np.pi
 
-        def I(phi=0): self.current_amplitude.value()/100 * np.exp(
-            1j * self.current_phase_angle.value()/180*np.pi) * np.exp(1j*phi)
+        def U(phi=0):
+            return U0 * np.exp(1j*Uangle) * np.exp(1j*phi)
 
-        def S1(phi=0): U(phi) * I(phi)
+        def I(phi=0):
+            return I0 * np.exp(1j*Iangle) * np.exp(1j*phi)
 
-        def S0(phi=0): U(phi) * np.conj(I(phi))
+        def S1(phi=0):
+            return U(phi=phi) * I(phi=phi)
 
-        def S(phi=0): S0(phi) + S1(phi)
+        def S0(phi=0):
+            return U(phi=phi) * np.conj(I(phi=phi))
+
+        def S(phi=0):
+            return S0(phi=phi) + S1(phi=phi)
 
         inst_phi_deg = self.instantaneous_phase_angle.value() - 90
         inst_phi_rad = inst_phi_deg / 180 * np.pi
