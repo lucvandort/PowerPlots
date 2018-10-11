@@ -1,11 +1,15 @@
 import sys
 import time
 import numpy as np
-# import pyqtgraph as pg
+import pyqtgraph as pg
 
 from PyQt5 import uic
 from PyQt5.QtCore import QThread, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMainWindow
+
+# Switch to using white background and black foreground
+pg.setConfigOption('background', 'w')
+pg.setConfigOption('foreground', 'k')
 
 
 def trap_exc_during_debug(*args):
