@@ -117,11 +117,15 @@ class PowerPlotApp(QMainWindow):
             color='c', zorder=32, lw=1, ls='--')
 
     def init_sinewave_plot(self):
-        self.sinewave_plot.plot(np.random.normal(size=100), clear=True)
+        # self.sinewave_plot.plot(np.random.normal(size=100), clear=True)
 
         # self.sinewave_plot.canvas.axes.set_ylim([-2, 2])
         # self.sinewave_plot.canvas.axes.set_xlim([-np.pi, 3*np.pi])
         # self.sinewave_plot.canvas.axes.grid(True)
+        self.sinewave_plot.showGrid(x=True, y=True)
+        self.sinewave_plot.disableAutoRange()
+        self.sinewave_plot.setYRange(min=-2, max=2, padding=0)
+        self.sinewave_plot.setXRange(min=-np.pi, max=3*np.pi, padding=0)
 
         # self.sinewave_timelines = {}
         # self.sinewave_timelines[-1] = self.sinewave_plot.canvas.axes.axvline(
@@ -131,15 +135,15 @@ class PowerPlotApp(QMainWindow):
         # self.sinewave_timelines[1] = self.sinewave_plot.canvas.axes.axvline(
         #     x=2*np.pi, color='black', zorder=1, lw=1, ls='--')
 
-        # self.phi = np.arange(-np.pi, 3*np.pi, 4*np.pi/1000)
+        self.phi = np.arange(-np.pi, 3*np.pi, 4*np.pi/1000)
 
-        # self.sinewave_lines = {}
-        # self.sinewave_lines['U'], = self.sinewave_plot.canvas.axes.plot(
-        #     self.phi, np.zeros(len(self.phi)), 'b', zorder=11)
-        # self.sinewave_lines['I'], = self.sinewave_plot.canvas.axes.plot(
-        #     self.phi, np.zeros(len(self.phi)), 'r', zorder=21)
-        # self.sinewave_lines['S'], = self.sinewave_plot.canvas.axes.plot(
-        #     self.phi, np.zeros(len(self.phi)), 'c', zorder=31)
+        self.sinewave_lines = {}
+        self.sinewave_lines['U'] = self.sinewave_plot.plot(
+            x=self.phi, y=np.zeros(len(self.phi))-1, pen='b')
+        self.sinewave_lines['I'] = self.sinewave_plot.plot(
+            x=self.phi, y=np.zeros(len(self.phi)), pen='r')
+        self.sinewave_lines['S'] = self.sinewave_plot.plot(
+            x=self.phi, y=np.zeros(len(self.phi))+1, pen='c')
         # # self.sinewave_lines['P'], = self.sinewave_plot.canvas.axes.plot(
         # #    self.phi, np.zeros(len(self.phi)), 'g', zorder=41)
         # # self.sinewave_lines['Q'], = self.sinewave_plot.canvas.axes.plot(
@@ -219,9 +223,9 @@ class PowerPlotApp(QMainWindow):
         self.phasor_plot.canvas.flush_events()
 
         # update sinewave lines
-        # self.sinewave_lines['U'].set_ydata(np.real(U(self.phi)))
-        # self.sinewave_lines['I'].set_ydata(np.real(I(self.phi)))
-        # self.sinewave_lines['S'].set_ydata(np.real(S(self.phi)))
+        self.sinewave_lines['U'].setData(x=self.phi, y=np.real(U(self.phi)))
+        self.sinewave_lines['I'].setData(x=self.phi, y=np.real(I(self.phi)))
+        self.sinewave_lines['S'].setData(x=self.phi, y=np.real(S(self.phi)))
         # self.sinewave_lines['P'].set_ydata(np.)
 
         # update sinewave timelines
