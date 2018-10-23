@@ -55,7 +55,8 @@ class PowerPlotApp(QMainWindow):
 
         self.playback_button.clicked.connect(self.start_playback)
         self.playback_reset_button.clicked.connect(
-            self.set_instantaneous_phase)
+            self.set_instantaneous_phase
+            )
 
     def start_playback(self):
         self.playback_reset_button.setEnabled(False)
@@ -66,7 +67,8 @@ class PowerPlotApp(QMainWindow):
 
         self.playback_thread = playbackThread()
         self.playback_thread.sig_step.connect(
-            self.increment_instantaneous_phase)
+            self.increment_instantaneous_phase
+            )
         self.playback_thread.start()
         self.playback_button.clicked.connect(self.playback_thread.terminate)
 
@@ -205,15 +207,24 @@ class PowerPlotApp(QMainWindow):
 
     def update_plots(self, inst_phi=0):
         U0 = self.voltage_amplitude.value()/100
-        Uangle = self.voltage_phase_angle.value()/180*np.pi
+        Uangle_deg = self.voltage_phase_angle.value() - 90
+        Uangle_rad = Uangle_deg / 180 * np.pi
+        self.voltage_phase_display.display(Uangle_deg)
+
         I0 = self.current_amplitude.value()/100
-        Iangle = self.current_phase_angle.value()/180*np.pi
+        Iangle_deg = self.current_phase_angle.value() - 90
+        Iangle_rad = Iangle_deg / 180 * np.pi
+        self.current_phase_display.display(Iangle_deg)
+
+        inst_phi_deg = self.instantaneous_phase_angle.value() - 90
+        inst_phi_rad = inst_phi_deg / 180 * np.pi
+        self.instantaneous_phase_display.display(inst_phi_deg)
 
         def U(phi=0):
-            return U0 * np.exp(1j*Uangle) * np.exp(1j*phi)
+            return U0 * np.exp(1j*Uangle_rad) * np.exp(1j*phi)
 
         def I(phi=0):
-            return I0 * np.exp(1j*Iangle) * np.exp(1j*phi)
+            return I0 * np.exp(1j*Iangle_rad) * np.exp(1j*phi)
 
         def S1(phi=0):
             return U(phi=phi) * I(phi=phi)
@@ -223,10 +234,6 @@ class PowerPlotApp(QMainWindow):
 
         def S(phi=0):
             return S0(phi=phi) + S1(phi=phi)
-
-        inst_phi_deg = self.instantaneous_phase_angle.value() - 90
-        inst_phi_rad = inst_phi_deg / 180 * np.pi
-        self.instantaneous_phase_display.display(inst_phi_deg)
 
         # plot phasor lines
         self.phasor_lines['U'].setData(

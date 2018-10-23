@@ -141,10 +141,16 @@
            </size>
           </property>
           <property name="minimum">
-           <number>-180</number>
+           <number>0</number>
           </property>
           <property name="maximum">
-           <number>180</number>
+           <number>360</number>
+          </property>
+          <property name="value">
+           <number>90</number>
+          </property>
+          <property name="invertedAppearance">
+           <bool>true</bool>
           </property>
           <property name="wrapping">
            <bool>true</bool>
@@ -208,7 +214,7 @@
            <number>100</number>
           </property>
           <property name="value">
-           <number>50</number>
+           <number>80</number>
           </property>
           <property name="notchTarget">
            <double>10.000000000000000</double>
@@ -239,7 +245,7 @@
            <enum>QLCDNumber::Filled</enum>
           </property>
           <property name="value" stdset="0">
-           <double>50.000000000000000</double>
+           <double>80.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -266,10 +272,16 @@
            </size>
           </property>
           <property name="minimum">
-           <number>-180</number>
+           <number>0</number>
           </property>
           <property name="maximum">
-           <number>180</number>
+           <number>360</number>
+          </property>
+          <property name="value">
+           <number>90</number>
+          </property>
+          <property name="invertedAppearance">
+           <bool>true</bool>
           </property>
           <property name="wrapping">
            <bool>true</bool>
@@ -494,50 +506,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>voltage_phase_angle</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>voltage_phase_display</receiver>
-   <slot>display(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>391</x>
-     <y>680</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>391</x>
-     <y>789</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>current_amplitude</sender>
    <signal>valueChanged(int)</signal>
    <receiver>current_amplitude_display</receiver>
    <slot>display(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>645</x>
-     <y>680</y>
+     <x>476</x>
+     <y>772</y>
     </hint>
     <hint type="destinationlabel">
-     <x>645</x>
-     <y>789</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>current_phase_angle</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>current_phase_display</receiver>
-   <slot>display(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>900</x>
-     <y>680</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>900</x>
-     <y>789</y>
+     <x>476</x>
+     <y>828</y>
     </hint>
    </hints>
   </connection>
