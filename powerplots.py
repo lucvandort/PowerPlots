@@ -207,16 +207,17 @@ class PowerPlotApp(QMainWindow):
 
     def update_plots(self, inst_phi=0):
         U0 = self.voltage_amplitude.value()/100
-        Uangle_deg = self.voltage_phase_angle.value() - 90
+        Uangle_deg = (self.voltage_phase_angle.value() + 90) % 360 - 180
         Uangle_rad = Uangle_deg / 180 * np.pi
         self.voltage_phase_display.display(Uangle_deg)
 
         I0 = self.current_amplitude.value()/100
-        Iangle_deg = self.current_phase_angle.value() - 90
+        Iangle_deg = (self.current_phase_angle.value() + 90) % 360 - 180
         Iangle_rad = Iangle_deg / 180 * np.pi
         self.current_phase_display.display(Iangle_deg)
 
-        inst_phi_deg = self.instantaneous_phase_angle.value() - 90
+        inst_phi_deg = \
+            (self.instantaneous_phase_angle.value() + 90) % 360 - 180
         inst_phi_rad = inst_phi_deg / 180 * np.pi
         self.instantaneous_phase_display.display(inst_phi_deg)
 
