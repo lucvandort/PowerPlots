@@ -105,16 +105,7 @@
            <enum>QFrame::NoFrame</enum>
           </property>
           <property name="smallDecimalPoint">
-           <bool>false</bool>
-          </property>
-          <property name="digitCount">
-           <number>3</number>
-          </property>
-          <property name="segmentStyle">
-           <enum>QLCDNumber::Filled</enum>
-          </property>
-          <property name="value" stdset="0">
-           <double>100.000000000000000</double>
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -175,16 +166,7 @@
            <enum>QFrame::NoFrame</enum>
           </property>
           <property name="smallDecimalPoint">
-           <bool>false</bool>
-          </property>
-          <property name="digitCount">
-           <number>4</number>
-          </property>
-          <property name="segmentStyle">
-           <enum>QLCDNumber::Filled</enum>
-          </property>
-          <property name="value" stdset="0">
-           <double>0.000000000000000</double>
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -236,16 +218,7 @@
            <enum>QFrame::NoFrame</enum>
           </property>
           <property name="smallDecimalPoint">
-           <bool>false</bool>
-          </property>
-          <property name="digitCount">
-           <number>3</number>
-          </property>
-          <property name="segmentStyle">
-           <enum>QLCDNumber::Filled</enum>
-          </property>
-          <property name="value" stdset="0">
-           <double>80.000000000000000</double>
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -307,15 +280,6 @@
           </property>
           <property name="smallDecimalPoint">
            <bool>false</bool>
-          </property>
-          <property name="digitCount">
-           <number>4</number>
-          </property>
-          <property name="segmentStyle">
-           <enum>QLCDNumber::Filled</enum>
-          </property>
-          <property name="value" stdset="0">
-           <double>0.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -449,16 +413,7 @@
            <enum>QFrame::NoFrame</enum>
           </property>
           <property name="smallDecimalPoint">
-           <bool>false</bool>
-          </property>
-          <property name="digitCount">
-           <number>4</number>
-          </property>
-          <property name="segmentStyle">
-           <enum>QLCDNumber::Filled</enum>
-          </property>
-          <property name="value" stdset="0">
-           <double>0.000000000000000</double>
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -488,38 +443,5 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>voltage_amplitude</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>voltage_amplitude_display</receiver>
-   <slot>display(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>136</x>
-     <y>680</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>136</x>
-     <y>789</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>current_amplitude</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>current_amplitude_display</receiver>
-   <slot>display(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>476</x>
-     <y>772</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>476</x>
-     <y>828</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
