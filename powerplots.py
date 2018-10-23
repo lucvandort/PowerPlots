@@ -276,11 +276,11 @@ class PowerPlotApp(QMainWindow):
             y=np.real(U(self.phi + inst_phi_rad)),
             )
         self.sinewave_lines['I'].setData(
-            x=self.deg, 
+            x=self.deg,
             y=np.real(I(self.phi + inst_phi_rad)),
             )
         self.sinewave_lines['S'].setData(
-            x=self.deg, 
+            x=self.deg,
             y=np.real(S(self.phi + inst_phi_rad)),
             )
         # self.sinewave_lines['P'].set_ydata(np.)
@@ -311,7 +311,13 @@ class PowerPlotApp(QMainWindow):
             self.instantaneous_phase_angle.value()+1)
 
 
-if __name__ == '__main__':
+def main():
     app = QApplication(sys.argv)
-    ex = PowerPlotApp()
-    sys.exit(app.exec_())
+    app.aboutToQuit.connect(app.deleteLater)
+    window = PowerPlotApp()
+    window.show()
+    app.exec_()
+
+
+if __name__ == '__main__':
+    main()
