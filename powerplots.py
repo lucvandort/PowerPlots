@@ -83,10 +83,17 @@ class PowerPlotApp(QMainWindow):
         ymin = -2
         ymax = 2
 
+        self.phasor_plot.setTitle('Phasors')
+        self.phasor_plot.setLabel('bottom', text='Real', units='p.u.')
+        self.phasor_plot.setLabel('left', text='Imaginary', units='p.u.')
         self.phasor_plot.showGrid(x=True, y=True)
+        self.phasor_plot.getAxis('bottom').setTickSpacing(major=1, minor=.1)
+        self.phasor_plot.getAxis('left').setTickSpacing(major=1, minor=.1)
+        self.phasor_plot.addLegend(offset=[30,-30])
+        self.phasor_plot.setAspectLocked(True, ratio=1)
         self.phasor_plot.disableAutoRange()
-        self.phasor_plot.setYRange(min=ymin, max=ymax, padding=0)
-        self.phasor_plot.setXRange(min=xmin, max=xmax, padding=0)
+        self.phasor_plot.setYRange(min=ymin, max=ymax)
+        self.phasor_plot.setXRange(min=xmin, max=xmax)
 
         # self.phasor_plot.canvas.axes.axhline(color='black', zorder=1, lw=1)
         # self.phasor_plot.canvas.axes.axvline(color='black', zorder=1, lw=1)
@@ -97,36 +104,46 @@ class PowerPlotApp(QMainWindow):
 
         self.phasor_lines = {}
         self.phasor_lines['U'] = self.phasor_plot.plot(
-            pen=pg.mkPen(color='b', width=2))
+            pen=pg.mkPen(color='b', width=3),
+            name='U',
+            )
         self.phasor_lines['I'] = self.phasor_plot.plot(
-            pen=pg.mkPen(color='r', width=2))
+            pen=pg.mkPen(color='r', width=3),
+            name='I',
+            )
         self.phasor_lines['S'] = self.phasor_plot.plot(
-            pen=pg.mkPen(color='g', width=2))
+            pen=pg.mkPen(color='g', width=3),
+            name='S',
+            )
 
         self.phasor_circles = {}
         self.phasor_circles['U'] = self.phasor_plot.plot(
-            pen=pg.mkPen(color='b', width=1))
+            pen=pg.mkPen(color='b', width=1, style=Qt.DotLine),
+            )
         self.phasor_circles['I'] = self.phasor_plot.plot(
-            pen=pg.mkPen(color='r', width=1))
+            pen=pg.mkPen(color='r', width=1, style=Qt.DotLine),
+            )
         self.phasor_circles['S'] = self.phasor_plot.plot(
-            pen=pg.mkPen(color='g', width=1))
+            pen=pg.mkPen(color='g', width=1, style=Qt.DotLine),
+            )
 
+        # phasor valuelines
         self.phasor_values = {}
-        self.phasor_values['U'] = self.phasor_plot.plot(
-            y=np.array([ymin, ymax]),
-            pen=pg.mkPen(color='b', width=1, style=Qt.DashLine))
-        self.phasor_values['I'] = self.phasor_plot.plot(
-            y=np.array([ymin, ymax]),
-            pen=pg.mkPen(color='r', width=1, style=Qt.DashLine))
-        self.phasor_values['P'] = self.phasor_plot.plot(
-            y=np.array([ymin, ymax]),
-            pen=pg.mkPen(color='g', width=1, style=Qt.DashLine))
+        self.phasor_values['U'] = self.phasor_plot.addLine(
+            x=0,
+            pen=pg.mkPen(color='b', width=2, style=Qt.DotLine))
+        self.phasor_values['I'] = self.phasor_plot.addLine(
+            x=0,
+            pen=pg.mkPen(color='r', width=2, style=Qt.DotLine))
+        self.phasor_values['P'] = self.phasor_plot.addLine(
+            x=0,
+            pen=pg.mkPen(color='g', width=2, style=Qt.DotLine))
         # self.phasor_values['Q'] = self.phasor_plot.canvas.axes.axhline(
         #     color='c', zorder=32, lw=1, ls='--')
 
     def init_sinewave_plot(self):
-        xmin = -180 # graden
-        xmax = 540 # graden
+        xmin = -180  # graden
+        xmax = 540  # graden
         ymin = -2
         ymax = 2
 
@@ -136,7 +153,7 @@ class PowerPlotApp(QMainWindow):
         self.sinewave_plot.showGrid(x=True, y=True)
         self.sinewave_plot.getAxis('bottom').setTickSpacing(major=90, minor=30)
         self.sinewave_plot.getAxis('left').setTickSpacing(major=1, minor=.1)
-        self.sinewave_plot.addLegend()
+        self.sinewave_plot.addLegend(offset=[30,-30])
         self.sinewave_plot.disableAutoRange()
         self.sinewave_plot.setYRange(min=ymin, max=ymax, padding=0)
         self.sinewave_plot.setXRange(min=xmin, max=xmax)
@@ -242,17 +259,14 @@ class PowerPlotApp(QMainWindow):
             )
 
         # plot phasor values
-        self.phasor_values['U'].setData(
-            x=np.real(U(inst_phi_rad))*np.ones(2),
-            y=self.phasor_values['U'].yData,
+        self.phasor_values['U'].setValue(
+            v=np.real(U(inst_phi_rad)),
             )
-        self.phasor_values['I'].setData(
-            x=np.real(I(inst_phi_rad))*np.ones(2),
-            y=self.phasor_values['I'].yData,
+        self.phasor_values['I'].setValue(
+            v=np.real(I(inst_phi_rad)),
             )
-        self.phasor_values['P'].setData(
-            x=np.real(S(inst_phi_rad))*np.ones(2),
-            y=self.phasor_values['P'].yData,
+        self.phasor_values['P'].setValue(
+            v=np.real(S(inst_phi_rad)),
             )
         # self.phasor_values['Q'].set_ydata(np.imag(S(inst_phi_rad))*np.ones(2))
 
