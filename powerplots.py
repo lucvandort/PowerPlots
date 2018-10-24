@@ -188,6 +188,11 @@ class PowerPlotApp(QMainWindow):
             self.apparent_power_changed
             )
 
+        # signal connectors for power_factor
+        self.power_factor.valueChanged.connect(
+            self.power_factor_changed
+            )
+
         # signal connectors for active_power
         self.active_power.valueChanged.connect(
             self.active_power_changed
@@ -264,6 +269,12 @@ class PowerPlotApp(QMainWindow):
         self.update_power_dials_displays(exclude='Q')
         self.update_plots()
 
+    def power_factor_changed(self):
+        self.update_current_from_power(changed='pf')
+        self.update_calculations()
+        self.update_power_dials_displays(exclude='pf')
+        self.update_plots()
+
     def instantaneous_phase_angle_changed(self):
         self.inst_phi_deg = \
             (self.instantaneous_phase_angle.value() + 90) % 360 - 180
@@ -290,6 +301,13 @@ class PowerPlotApp(QMainWindow):
             Q = self.reactive_power.value() / 100
             P = np.real(self.S0complex)
             S = P + 1j*Q
+            self.I0 = np.abs(S) / self.U0
+            self.Iangle_rad = -np.angle(S) + self.Uangle_rad
+            self.Iangle_deg = self.Iangle_rad / np.pi * 180
+        if changed is 'pf':
+            Sangle_deg = (self.power_factor.value() + 90) % 360 - 180
+            Sangle_rad = Sangle_deg / 180 * np.pi
+            S = np.abs(self.S0complex) * np.exp(1j * Sangle_rad)
             self.I0 = np.abs(S) / self.U0
             self.Iangle_rad = -np.angle(S) + self.Uangle_rad
             self.Iangle_deg = self.Iangle_rad / np.pi * 180
@@ -334,9 +352,9 @@ class PowerPlotApp(QMainWindow):
 
         pf = P / S
         indcap = ""
-        if Q > 0:
+        if P*Q > 0:
             indcap = " IND"
-        elif Q < 0:
+        elif P*Q < 0:
             indcap = " CAP"
         self.power_factor_display.setText(
             "{:0.2f}{}".format(pf, indcap)
