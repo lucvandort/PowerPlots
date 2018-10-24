@@ -219,7 +219,7 @@ class PowerPlotApp(QMainWindow):
     def voltage_amplitude_changed(self):
         self.U0 = self.voltage_amplitude.value() / 100
         self.update_calculations()
-        self.voltage_amplitude_display.display("{:0.2f}".format(self.U0))
+        self.voltage_amplitude_display.setText("{:0.2f}".format(self.U0))
         self.update_power_dials_displays()
         self.update_plots()
 
@@ -227,14 +227,14 @@ class PowerPlotApp(QMainWindow):
         self.Uangle_deg = (self.voltage_phase_angle.value() + 90) % 360 - 180
         self.Uangle_rad = self.Uangle_deg / 180 * np.pi
         self.update_calculations()
-        self.voltage_phase_display.display(int(self.Uangle_deg))
+        self.voltage_phase_display.setText("{:0.0f}".format(self.Uangle_deg))
         self.update_power_dials_displays()
         self.update_plots()
 
     def current_amplitude_changed(self):
         self.I0 = self.current_amplitude.value() / 100
         self.update_calculations()
-        self.current_amplitude_display.display("{:0.2f}".format(self.I0))
+        self.current_amplitude_display.setText("{:0.2f}".format(self.I0))
         self.update_power_dials_displays()
         self.update_plots()
 
@@ -242,7 +242,7 @@ class PowerPlotApp(QMainWindow):
         self.Iangle_deg = (self.current_phase_angle.value() + 90) % 360 - 180
         self.Iangle_rad = self.Iangle_deg / 180 * np.pi
         self.update_calculations()
-        self.current_phase_display.display(int(self.Iangle_deg))
+        self.current_phase_display.setText("{:0.0f}".format(self.Iangle_deg))
         self.update_power_dials_displays()
         self.update_plots()
 
@@ -269,7 +269,7 @@ class PowerPlotApp(QMainWindow):
             (self.instantaneous_phase_angle.value() + 90) % 360 - 180
         self.inst_phi_rad = self.inst_phi_deg / 180 * np.pi
         self.update_calculations()
-        self.instantaneous_phase_display.display(self.inst_phi_deg)
+        self.instantaneous_phase_display.setText("{:0.0f}".format(self.inst_phi_deg))
         self.update_plots()
 
     def playback_speed_changed(self):
@@ -297,16 +297,16 @@ class PowerPlotApp(QMainWindow):
         self.current_amplitude.blockSignals(True)
         self.current_amplitude.setValue(self.I0 * 100)
         self.current_amplitude.blockSignals(False)
-        self.current_amplitude_display.display("{:0.2f}".format(self.I0))
+        self.current_amplitude_display.setText("{:0.2f}".format(self.I0))
 
         self.current_phase_angle.blockSignals(True)
         self.current_phase_angle.setValue((self.Iangle_deg + 90 + 360) % 360)
         self.current_phase_angle.blockSignals(False)
-        self.current_phase_display.display(int(self.Iangle_deg))
+        self.current_phase_display.setText("{:0.0f}".format(self.Iangle_deg))
 
     def update_power_dials_displays(self, exclude=''):
         S = np.abs(self.S0complex)
-        self.apparent_power_display.display(
+        self.apparent_power_display.setText(
             "{:0.2f}".format(S)
             )
         if 'S' not in exclude:
@@ -315,7 +315,7 @@ class PowerPlotApp(QMainWindow):
             self.apparent_power.blockSignals(False)
 
         P = np.real(self.S0complex)
-        self.active_power_display.display(
+        self.active_power_display.setText(
             "{:0.2f}".format(P)
             )
         if 'P' not in exclude:
@@ -324,7 +324,7 @@ class PowerPlotApp(QMainWindow):
             self.active_power.blockSignals(False)
 
         Q = np.imag(self.S0complex)
-        self.reactive_power_display.display(
+        self.reactive_power_display.setText(
             "{:0.2f}".format(Q)
             )
         if 'Q' not in exclude:
@@ -333,8 +333,13 @@ class PowerPlotApp(QMainWindow):
             self.reactive_power.blockSignals(False)
 
         pf = P / S
-        self.power_factor_display.display(
-            "{:0.2f}".format(pf)
+        indcap = ""
+        if Q > 0:
+            indcap = " IND"
+        elif Q < 0:
+            indcap = " CAP"
+        self.power_factor_display.setText(
+            "{:0.2f}{}".format(pf, indcap)
             )
         if 'pf' not in exclude:
             self.power_factor.blockSignals(True)
@@ -611,7 +616,7 @@ class PowerPlotApp(QMainWindow):
             (self.inst_phi_deg + 90 + 360) % 360
             )
         self.update_calculations()
-        self.instantaneous_phase_display.display(int(self.inst_phi_deg))
+        self.instantaneous_phase_display.setText("{:0.0f}".format(self.inst_phi_deg))
         self.update_plots()
 
 
