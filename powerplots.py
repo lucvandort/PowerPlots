@@ -32,13 +32,19 @@ class playbackThread(QThread):
         self.wait()
 
     def start(self):
-        self.steptimer.start(20)
+        self.steptimer.start(15)
 
     def stop(self):
         self.steptimer.stop()
 
 
 class PowerPlotApp(QMainWindow):
+
+    RESET_ANIMATION = np.array(
+        [1 - (np.tanh(x) + 1) / 2
+        for x
+        in np.linspace(-2, 2, 30)]
+        )
 
     # calculation functions
     def U(self,
@@ -155,6 +161,9 @@ class PowerPlotApp(QMainWindow):
         self.inst_phi_deg = 0
         self.inst_phi_rad = 0
         self.playback_stepsize = 0
+        self.i = 0
+        self.reset_animation_phi_rad = 0
+        self.reset_animation_phi_deg = 0
 
         # get initial values from GUI
         self.voltage_amplitude_changed()
@@ -212,14 +221,11 @@ class PowerPlotApp(QMainWindow):
             )
         self.playback_button.clicked.connect(self.start_playback)
         self.playback_reset_button.clicked.connect(
-            self.set_instantaneous_phase
+            self.reset_instantaneous_phase
             )
 
         # initialize playback thread
         self.playback_thread = playbackThread()
-        self.playback_thread.sig_step.connect(
-            self.increment_instantaneous_phase
-            )
 
     def voltage_amplitude_changed(self):
         self.U0 = self.voltage_amplitude.value() / 100
@@ -280,7 +286,9 @@ class PowerPlotApp(QMainWindow):
             (self.instantaneous_phase_angle.value() + 90) % 360 - 180
         self.inst_phi_rad = self.inst_phi_deg / 180 * np.pi
         self.update_calculations()
-        self.instantaneous_phase_display.setText("{:0.0f}".format(self.inst_phi_deg))
+        self.instantaneous_phase_display.setText(
+            "{:0.0f}".format(self.inst_phi_deg)
+            )
         self.update_plots()
 
     def playback_speed_changed(self):
@@ -375,12 +383,13 @@ class PowerPlotApp(QMainWindow):
         self.instantaneous_phase_angle.valueChanged.disconnect(
             self.instantaneous_phase_angle_changed
             )
-
+        self.playback_thread.sig_step.connect(
+            self.increment_instantaneous_phase
+            )
         self.playback_thread.start()
 
     def stop_playback(self):
         self.playback_thread.stop()
-
         self.playback_reset_button.setEnabled(True)
         self.instantaneous_phase_angle.setEnabled(True)
         self.playback_button.setText('Play')
@@ -623,18 +632,48 @@ class PowerPlotApp(QMainWindow):
             v=np.real(self.Scomplex),
             )
 
-    def set_instantaneous_phase(self, phase=0):
-        self.instantaneous_phase_angle.setValue(phase + 90)
+    def reset_instantaneous_phase(self, phase=0):
+        self.playback_button.clicked.disconnect(self.start_playback)
+        self.playback_thread.sig_step.connect(
+            self.animate_instantaneous_phase_to_zero
+            )
+        self.i = 0
+        self.reset_animation_phi_deg = \
+            self.inst_phi_deg * self.RESET_ANIMATION
+        self.reset_animation_phi_rad = \
+            self.reset_animation_phi_deg / 180 * np.pi
+        self.playback_thread.start()
+
+    def animate_instantaneous_phase_to_zero(self):
+        try:
+            self.inst_phi_deg = self.reset_animation_phi_deg[self.i]
+            self.inst_phi_rad = self.reset_animation_phi_rad[self.i]
+            self.set_instantaneous_phase()
+            self.i += 1
+        except IndexError:
+            self.playback_thread.stop()
+            self.playback_thread.sig_step.disconnect(
+                self.animate_instantaneous_phase_to_zero
+                )
+            self.inst_phi_deg = 0
+            self.inst_phi_rad = 0
+            self.set_instantaneous_phase()
+            self.playback_button.clicked.connect(self.start_playback)
 
     def increment_instantaneous_phase(self):
         self.inst_phi_deg = \
             (self.inst_phi_deg + self.playback_stepsize + 180) % 360 - 180
         self.inst_phi_rad = self.inst_phi_deg / 180 * np.pi
+        self.set_instantaneous_phase()
+
+    def set_instantaneous_phase(self):
         self.instantaneous_phase_angle.setValue(
             (self.inst_phi_deg + 90 + 360) % 360
             )
         self.update_calculations()
-        self.instantaneous_phase_display.setText("{:0.0f}".format(self.inst_phi_deg))
+        self.instantaneous_phase_display.setText(
+            "{:0.0f}".format(self.inst_phi_deg)
+            )
         self.update_plots()
 
 
