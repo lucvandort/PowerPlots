@@ -97,6 +97,17 @@ class PowerPlotApp(QMainWindow):
         self.phasor_plot.setYRange(min=ymin, max=ymax)
         self.phasor_plot.setXRange(min=xmin, max=xmax)
 
+        self.phasor_plot.addLine(
+            x=0,
+            pen=pg.mkPen('w', width=2, style=Qt.DashLine),
+            z=-1,
+            )
+        self.phasor_plot.addLine(
+            y=0,
+            pen=pg.mkPen('w', width=2, style=Qt.DashLine),
+            z=-1,
+            )
+
         # self.phasor_plot.canvas.axes.axhline(color='black', zorder=1, lw=1)
         # self.phasor_plot.canvas.axes.axvline(color='black', zorder=1, lw=1)
         # unity_circle = np.exp(-1j*np.arange(0, 2*np.pi, np.pi/180))
@@ -162,6 +173,11 @@ class PowerPlotApp(QMainWindow):
 
         self.sinewave_plot.addLine(
             x=0,
+            pen=pg.mkPen('w', width=2, style=Qt.DashLine),
+            z=-1,
+            )
+        self.sinewave_plot.addLine(
+            y=0,
             pen=pg.mkPen('w', width=2, style=Qt.DashLine),
             z=-1,
             )
