@@ -26,14 +26,17 @@ class playbackThread(QThread):
 
     def __init__(self):
         QThread.__init__(self)
+        self.steptimer = QTimer(self)
+        self.steptimer.timeout.connect(self.sig_step.emit)
 
-    # def __del__(self):
-    #     self.wait()
+    def __del__(self):
+        self.wait()
 
-    def run(self):
-        while(True):
-            self.sig_step.emit()
-            time.sleep(0.1)
+    def start(self):
+        self.steptimer.start(20)
+
+    def stop(self):
+        self.steptimer.stop()
 
 
 class PowerPlotApp(QMainWindow):
@@ -137,8 +140,6 @@ class PowerPlotApp(QMainWindow):
         self.I0 = 0
         self.Iangle_deg = 0
         self.Iangle_rad = 0
-        self.inst_phi_deg = 0
-        self.inst_phi_rad = 0
 
         self.deg_range = 0
         self.phi_range = 0
@@ -152,11 +153,16 @@ class PowerPlotApp(QMainWindow):
         self.init_phasor_plot()
         self.init_sinewave_plot()
 
+        self.inst_phi_deg = 0
+        self.inst_phi_rad = 0
+        self.playback_stepsize = 0
+
         # get initial values from GUI
         self.voltage_amplitude_changed()
         self.voltage_phase_angle_changed()
         self.current_amplitude_changed()
         self.current_phase_angle_changed()
+        self.playback_speed_changed()
 
         # signal connectors for voltage_amplitude
         self.voltage_amplitude.valueChanged.connect(
@@ -178,17 +184,17 @@ class PowerPlotApp(QMainWindow):
             self.current_phase_angle_changed
             )
 
-        # # signal connectors for apparent_power
+        # signal connectors for apparent_power
         self.apparent_power.valueChanged.connect(
             self.apparent_power_changed
             )
 
-        # # signal connectors for active_power
+        # signal connectors for active_power
         self.active_power.valueChanged.connect(
             self.active_power_changed
             )
 
-        # # signal connectors for reactive_power
+        # signal connectors for reactive_power
         self.reactive_power.valueChanged.connect(
             self.reactive_power_changed
             )
@@ -197,10 +203,18 @@ class PowerPlotApp(QMainWindow):
         self.instantaneous_phase_angle.valueChanged.connect(
             self.instantaneous_phase_angle_changed
             )
-
+        self.playback_speed.valueChanged.connect(
+            self.playback_speed_changed
+            )
         self.playback_button.clicked.connect(self.start_playback)
         self.playback_reset_button.clicked.connect(
             self.set_instantaneous_phase
+            )
+
+        # initialize playback thread
+        self.playback_thread = playbackThread()
+        self.playback_thread.sig_step.connect(
+            self.increment_instantaneous_phase
             )
 
     def voltage_amplitude_changed(self):
@@ -258,6 +272,9 @@ class PowerPlotApp(QMainWindow):
         self.update_calculations()
         self.instantaneous_phase_display.display(self.inst_phi_deg)
         self.update_plots()
+
+    def playback_speed_changed(self):
+        self.playback_stepsize = 10 ** (self.playback_speed.value() / 50) / 10
 
     def update_current_from_power(self, changed):
         if changed is 'S':
@@ -320,20 +337,23 @@ class PowerPlotApp(QMainWindow):
         self.playback_button.setText('Pause')
         self.playback_button.clicked.disconnect(self.start_playback)
         self.playback_button.clicked.connect(self.stop_playback)
-
-        self.playback_thread = playbackThread()
-        self.playback_thread.sig_step.connect(
-            self.increment_instantaneous_phase
+        self.instantaneous_phase_angle.valueChanged.disconnect(
+            self.instantaneous_phase_angle_changed
             )
+
         self.playback_thread.start()
-        self.playback_button.clicked.connect(self.playback_thread.terminate)
 
     def stop_playback(self):
+        self.playback_thread.stop()
+
         self.playback_reset_button.setEnabled(True)
         self.instantaneous_phase_angle.setEnabled(True)
         self.playback_button.setText('Play')
         self.playback_button.clicked.disconnect(self.stop_playback)
         self.playback_button.clicked.connect(self.start_playback)
+        self.instantaneous_phase_angle.valueChanged.connect(
+            self.instantaneous_phase_angle_changed
+            )
 
     def init_phasor_plot(self):
         xmin = -2
@@ -538,34 +558,25 @@ class PowerPlotApp(QMainWindow):
         # self.phasor_values['Q'].set_ydata(np.imag(S(inst_phi_rad))*np.ones(2))
 
         # update sinewave lines
-        phi_realtime = self.phi_range + self.inst_phi_rad
+        phi_waveform = self.phi_range + self.inst_phi_rad
 
-        Urealtime = np.real(self.U(phi=phi_realtime))
+        Uwaveform = np.real(self.U(phi=phi_waveform))
         self.sinewave_lines['U'].setData(
             x=self.deg_range,
-            y=Urealtime,
+            y=Uwaveform,
             )
 
-        Irealtime = np.real(self.I(phi=phi_realtime))
+        Iwaveform = np.real(self.I(phi=phi_waveform))
         self.sinewave_lines['I'].setData(
             x=self.deg_range,
-            y=Irealtime,
+            y=Iwaveform,
             )
 
-        Srealtime = np.real(self.S(phi=phi_realtime))
+        Swaveform = np.real(self.S(phi=phi_waveform))
         self.sinewave_lines['S'].setData(
             x=self.deg_range,
-            y=Srealtime,
+            y=Swaveform,
             )
-        # self.sinewave_lines['P'].set_ydata(np.)
-
-        # update sinewave timelines
-        # self.sinewave_timelines[-1].set_xdata(
-        #     (inst_phi_rad-2*np.pi)*np.ones(2))
-        # self.sinewave_timelines[0].set_xdata(
-        #     (inst_phi_rad)*np.ones(2))
-        # self.sinewave_timelines[1].set_xdata(
-        #     (inst_phi_rad+2*np.pi)*np.ones(2))
 
         self.sinewave_valuelines['U'].setValue(
             v=np.real(self.Ucomplex),
@@ -578,11 +589,18 @@ class PowerPlotApp(QMainWindow):
             )
 
     def set_instantaneous_phase(self, phase=0):
-        self.instantaneous_phase_angle.setValue(phase+90)
+        self.instantaneous_phase_angle.setValue(phase + 90)
 
     def increment_instantaneous_phase(self):
+        self.inst_phi_deg = \
+            (self.inst_phi_deg + self.playback_stepsize + 180) % 360 - 180
+        self.inst_phi_rad = self.inst_phi_deg / 180 * np.pi
         self.instantaneous_phase_angle.setValue(
-            self.instantaneous_phase_angle.value()+1)
+            (self.inst_phi_deg + 90 + 360) % 360
+            )
+        self.update_calculations()
+        self.instantaneous_phase_display.display(int(self.inst_phi_deg))
+        self.update_plots()
 
 
 def main():
