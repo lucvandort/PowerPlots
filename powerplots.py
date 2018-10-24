@@ -281,15 +281,17 @@ class PowerPlotApp(QMainWindow):
             self.I0 = S / self.U0
         if changed is 'P':
             P = self.active_power.value() / 100
-            S = np.abs(P + 1j*np.imag(self.S0complex))
-            self.I0 = S / self.U0
-            self.Iangle_rad = -np.arccos(P/S) + self.Uangle_rad
+            Q = np.imag(self.S0complex)
+            S = P + 1j*Q
+            self.I0 = np.abs(S) / self.U0
+            self.Iangle_rad = -np.angle(S) + self.Uangle_rad
             self.Iangle_deg = self.Iangle_rad / np.pi * 180
         if changed is 'Q':
             Q = self.reactive_power.value() / 100
-            S = np.abs(np.real(self.S0complex) + 1j*Q)
-            self.I0 = S / self.U0
-            self.Iangle_rad = -np.arcsin(Q/S) + self.Uangle_rad
+            P = np.real(self.S0complex)
+            S = P + 1j*Q
+            self.I0 = np.abs(S) / self.U0
+            self.Iangle_rad = -np.angle(S) + self.Uangle_rad
             self.Iangle_deg = self.Iangle_rad / np.pi * 180
 
         self.current_amplitude.blockSignals(True)
@@ -329,6 +331,17 @@ class PowerPlotApp(QMainWindow):
             self.reactive_power.blockSignals(True)
             self.reactive_power.setValue(Q*100)
             self.reactive_power.blockSignals(False)
+
+        pf = P / S
+        self.power_factor_display.display(
+            "{:0.2f}".format(pf)
+            )
+        if 'pf' not in exclude:
+            self.power_factor.blockSignals(True)
+            self.power_factor.setValue(
+                (self.Uangle_deg - self.Iangle_deg + 90 + 360) % 360
+                )
+            self.power_factor.blockSignals(False)
 
     def start_playback(self):
         self.playback_reset_button.setEnabled(False)
