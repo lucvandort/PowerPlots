@@ -390,6 +390,9 @@ class PowerPlotApp(QMainWindow):
 
     def stop_playback(self):
         self.playback_thread.stop()
+        self.playback_thread.sig_step.disconnect(
+            self.increment_instantaneous_phase
+            )
         self.playback_reset_button.setEnabled(True)
         self.instantaneous_phase_angle.setEnabled(True)
         self.playback_button.setText('Play')
